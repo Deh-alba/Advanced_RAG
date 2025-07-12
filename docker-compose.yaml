@@ -1,0 +1,37 @@
+services:
+  fastapi:
+    build:
+      context: ./api
+    container_name: api_agent
+    ports:
+      - "8000"
+    volumes:
+      - ./api:/app
+      - .:/usr/src/project:rw
+    environment:
+      - PYTHONUNBUFFERED=1
+    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+    restart: unless-stopped
+
+
+
+  app:
+    build:
+      context: ./front
+    container_name: front_agent
+    ports:
+      - "8129:8080"
+    volumes:
+      - ./front:/app
+      - .:/usr/src/project
+    environment:
+      - PYTHONUNBUFFERED=1
+      - BASE_URL=http://fastapi:8000
+    restart: unless-stopped
+    depends_on:
+      - fastapi
+
+
+      
+volumes:
+  sop_agent:
